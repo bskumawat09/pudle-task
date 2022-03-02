@@ -1,0 +1,26 @@
+const contactController = require("./controllers/contact-controller");
+const messageController = require("./controllers/message-controller");
+
+const router = require("express").Router();
+
+// @request GET "/api/contacts"
+// @desc get all the contacts
+router.get("/contacts", contactController.getAllContacts);
+
+// @request GET "/api/contacts/{id}"
+// @desc get single contact by id
+router.get("/contacts/:id", contactController.getContact);
+
+// @request GET "/api/messages"
+// @desc get all the messages
+router.get("/messages", messageController.getMessages);
+
+// @request POST "/api/message/{id}"
+// @desc send message to the contact with {id}
+router.post("/messages/:id", messageController.sendOtpMessage);
+
+// @request POST "/api/contacts"
+// @desc create new contact
+router.post("/contacts", contactController.createContact);
+
+module.exports = router;
