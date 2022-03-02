@@ -18,7 +18,6 @@ class MessageController {
 	async sendOtpMessage(req, res) {
 		const { id } = req.params; // id of recipient contact
 		const { text } = req.body; // body(text) of message
-
 		try {
 			const contact = await Contact.findOne({ _id: id });
 			if (!contact) {
