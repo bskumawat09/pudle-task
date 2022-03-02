@@ -1,12 +1,9 @@
-const Contact = require("../models/contact-model");
-const Message = require("../models/message-model");
+const contactService = require("../services/contact-service");
 const messageService = require("../services/message-service");
 
 class MessageController {
 	async getMessages(req, res) {
-		const messages = await Message.find()
-			.sort({ createdAt: -1 })
-			.populate("recipient", "firstName lastName phoneNumber");
+		const messages = await messageService.findMessages();
 
 		res.json({
 			status: "success",
@@ -17,23 +14,21 @@ class MessageController {
 
 	async sendOtpMessage(req, res) {
 		const { id } = req.params; // id of recipient contact
-		const { text } = req.body; // body(text) of message
+		const { text } = req.body; // body(text) of message e.g "Hi, Your OTP is 985604"
 		try {
-			const contact = await Contact.findOne({ _id: id });
+			const contact = await contactService.findContact(id);
 			if (!contact) {
 				throw new Error("contact not found");
 			}
 			// create new message
-			const newMessage = await Message.create({
-				recipient: id,
-				text: text
-			});
+			const newMessage = await messageService.createMessage({ id, text });
 
-			// send "newMessage" via SMS using some 3rd party service (Twilio)
-			messageService.sendSms(contact, text);
+			// send "newMessage" via SMS using some 3rd party service (e.g Twilio)
+			const sid = await messageService.sendSms(contact, text);
 
 			res.json({
 				status: "success",
+				sid,
 				message: newMessage
 			});
 		} catch (err) {

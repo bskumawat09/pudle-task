@@ -1,9 +1,9 @@
-const Contact = require("../models/contact-model");
+const contactService = require("../services/contact-service");
 
 class ContactController {
 	async getAllContacts(req, res) {
 		try {
-			const contacts = await Contact.find().sort({ firstName: 1, lastName: 1 });
+			const contacts = await contactService.findAllContacts();
 
 			res.json({
 				status: "success",
@@ -21,7 +21,7 @@ class ContactController {
 	async getContact(req, res) {
 		const { id } = req.params;
 		try {
-			const contact = await Contact.findOne({ _id: id });
+			const contact = await contactService.findContact(id);
 			if (!contact) {
 				throw new Error("contact not found");
 			}
@@ -40,7 +40,12 @@ class ContactController {
 
 	async createContact(req, res) {
 		try {
-			const contact = await Contact.create(req.body);
+			const { firstName, lastName, phoneNumber } = req.body;
+			const contact = await contactService.createContact({
+				firstName,
+				lastName,
+				phoneNumber
+			});
 
 			res.json({
 				status: "success",
@@ -57,7 +62,7 @@ class ContactController {
 	async deleteContact(req, res) {
 		const { id } = req.params;
 		try {
-			const contact = await Contact.findByIdAndDelete(id);
+			const contact = await contactService.deleteContact(id);
 			if (!contact) {
 				throw new Error("contact not found");
 			}
